@@ -3,9 +3,9 @@ jQuery(document).ready(function( $ ) {
     // conditionally show option when limit entries is checked
     function DisplayLimitEntryFieldSum() {
         if ( $('#gform_limit_entries').is(':checked') ) {
-                $('#limit_entries_custom').show().find('.gf_animate_sub_settings').slideDown();
+                $('#custom_entry_limit').show().find('.gf_animate_sub_settings').slideDown();
             } else {
-        		$('#limit_entries_custom').hide();
+        		$('#custom_entry_limit').hide();
             }
     }
 

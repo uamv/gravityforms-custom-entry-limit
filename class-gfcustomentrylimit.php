@@ -163,8 +163,16 @@ class GFCustomEntryLimit extends GFAddOn {
 	 */
 	public function add_entry_option( $settings, $form ) {
 
+		$i = 0;
+		foreach ( $settings['Restrictions'] as $key => $value ) {
+			if ( 'entry_limit_message' == $key ) {
+				break;
+			}
+			$i++;
+		}
+
 		$settings['Restrictions'] =
-			array_splice( $settings['Restrictions'], 0, 3, true ) +
+			array_slice( $settings['Restrictions'], 0, $i + 1 ) +
 			array( 'custom_entry_limit' =>
 				'<tr id="custom_entry_limit" class="child_setting_row">
 					<td colspan="2" class="gf_sub_settings_cell">
@@ -180,7 +188,7 @@ class GFCustomEntryLimit extends GFAddOn {
 						</div>
 					</td>
 				</tr>' ) +
-			array_splice( $settings['Restrictions'], 3, count( $settings['Restrictions'] ) - 1, true );
+			array_slice( $settings['Restrictions'], $i + 1, count( $settings['Restrictions'] ) - 1 );
 
 		return $settings;
 
