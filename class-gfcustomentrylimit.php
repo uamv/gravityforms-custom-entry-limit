@@ -213,7 +213,7 @@ class GFCustomEntryLimit extends GFAddOn {
 	 */
 	public function render_sum( $form ){
 
-		if ( $form['limitEntries'] && 'summed-fields' == $form['limitEntriesCustom'] ) {
+		if ( isset( $form['limitEntries'] ) && $form['limitEntries'] && 'summed-fields' == $form['limitEntriesCustom'] ) {
 
 			if( $this->get_sum( $form ) >= $form['limitEntriesCount'] ) {
 
