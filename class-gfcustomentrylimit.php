@@ -213,7 +213,7 @@ class GFCustomEntryLimit extends GFAddOn {
 	 */
 	public function render_sum( $form ){
 
-		if ( isset( $form['limitEntries'] ) && $form['limitEntries'] && 'summed-fields' == $form['limitEntriesCustom'] ) {
+		if ( isset( $form['limitEntries'] ) && $form['limitEntries'] && isset( $form['limitEntries'] ) && 'summed-fields' == $form['limitEntriesCustom'] ) {
 
 			if( $this->get_sum( $form ) >= $form['limitEntriesCount'] ) {
 
@@ -257,42 +257,47 @@ class GFCustomEntryLimit extends GFAddOn {
 	public function validate_entry_margin( $validation_result ) {
 
 		$form = $validation_result['form'];
-		$current_page = rgpost( 'gform_source_page_number_' . $form['id'] ) ? rgpost( 'gform_source_page_number_' . $form['id'] ) : 1;
-		$entry = GFFormsModel::get_current_lead();
 
-		// Get number of remaining entries allowable
-		$margin = $this->get_limit_margin($form);
-		$addends = $this->get_addends($form);
+		if ( isset( $form['limitEntries'] ) && $form['limitEntries'] && isset( $form['limitEntries'] ) && 'summed-fields' == $form['limitEntriesCustom'] ) {
 
-		$entry_sum = $this->get_lead_sum($entry, $addends);
+			$current_page = rgpost( 'gform_source_page_number_' . $form['id'] ) ? rgpost( 'gform_source_page_number_' . $form['id'] ) : 1;
+			$entry = GFFormsModel::get_current_lead();
 
-		if ( $entry_sum > $margin ) {
+			// Get number of remaining entries allowable
+			$margin = $this->get_limit_margin($form);
+			$addends = $this->get_addends($form);
 
-			$validation_result['is_valid'] = false;
+			$entry_sum = $this->get_lead_sum($entry, $addends);
 
-			foreach( $form['fields'] as &$field ) {
+			if ( $entry_sum > $margin ) {
 
-				// If the field is not included as an addend, skip it
-				if ( ! $field['includeAsAddend'] ) {
-					continue;
+				$validation_result['is_valid'] = false;
+
+				foreach( $form['fields'] as &$field ) {
+
+					// If the field is not included as an addend, skip it
+					if ( ! $field['includeAsAddend'] ) {
+						continue;
+					}
+
+					// If the field is not on the current page OR if the field is hidden, skip it
+					$field_page = $field->pageNumber;
+					$is_hidden = RGFormsModel::is_field_hidden( $form, $field, array() );
+
+					if ( $field_page != $current_page || $is_hidden ) {
+						continue;
+					}
+
+					$field->failed_validation = true;
+					$field->validation_message = add_filter( 'custom_entry_limit_will_exceed_message', 'Total exceeds allowable limit' );
+
 				}
-
-				// If the field is not on the current page OR if the field is hidden, skip it
-				$field_page = $field->pageNumber;
-				$is_hidden = RGFormsModel::is_field_hidden( $form, $field, array() );
-
-				if ( $field_page != $current_page || $is_hidden ) {
-					continue;
-				}
-
-				$field->failed_validation = true;
-				$field->validation_message = add_filter( 'custom_entry_limit_will_exceed_message', 'Total exceeds allowable limit' );
 
 			}
 
-		}
+			$validation_result['form'] = $form;
 
-		$validation_result['form'] = $form;
+		}
 
 		return $validation_result;
 
