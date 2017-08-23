@@ -13,6 +13,6 @@ jQuery(document).ready(function( $ ) {
 
     $('#gform_limit_entries').click(function() {
         DisplayLimitEntryFieldSum();
-    })
+    });
 
 });
