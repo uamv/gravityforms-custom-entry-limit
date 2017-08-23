@@ -34,11 +34,9 @@ class GFCustomEntryLimit extends GFAddOn {
 		parent::init();
 		$this->add_tooltip( 'custom_entry_limit', sprintf(
             '<h6>%s</h6> %s',
-            __( 'Summed Fields As Entries', 'gravityperks' ),
-            __( 'When limiting entries, this option will allow you to treat the sum of values for fields you have specified to be counted as form entries instead of the actual total of form entries submitted.', 'gravityperks' )
+            __( 'Summed Fields As Entries' ),
+            __( 'When limiting entries, this option will allow you to treat the sum of values for fields you have specified to be counted as form entries instead of the actual total of form entries submitted.' )
         ) );
-
-	    load_plugin_textdomain( 'typewheel-gf-custom-entry-limit', false, basename( dirname( __file__ ) ) . '/languages/' );
 
         add_action( 'gform_field_advanced_settings', array( $this, 'add_setting' ), 10, 2 );
 
@@ -50,7 +48,7 @@ class GFCustomEntryLimit extends GFAddOn {
 
         add_filter( 'gform_pre_render', array( $this, 'render_sum' ) );
 
-        add_filter( 'gform_shortcode_entries_left', array( $this, 'entries_left_shortcode' ), 10, 2 );
+        add_filter( 'gform_shortcode_entries_remaining', array( $this, 'entries_remaining_shortcode' ), 10, 2 );
         add_filter( 'gform_shortcode_entry_count', array( $this, 'entry_count_shortcode' ), 10, 2 );
 
         add_filter( 'gform_validation', array( $this, 'validate_entry_margin' ) );
@@ -289,7 +287,7 @@ class GFCustomEntryLimit extends GFAddOn {
 					}
 
 					$field->failed_validation = true;
-					$field->validation_message = add_filter( 'custom_entry_limit_will_exceed_message', 'Total exceeds allowable limit' );
+					$field->validation_message = apply_filters( 'custom_entry_limit_will_exceed_message', 'Total exceeds allowable limit' );
 
 				}
 
@@ -315,9 +313,9 @@ class GFCustomEntryLimit extends GFAddOn {
 		} elseif ( 'summed-fields' == rgar( $form, 'limitEntriesCustom' ) ) {
 			$entry_count = $this->get_sum($form);
 		}
-		$entries_left = rgar( $form, 'limitEntriesCount' ) - $entry_count;
+		$entries_remaining = rgar( $form, 'limitEntriesCount' ) - $entry_count;
 
-		return $entries_left;
+		return $entries_remaining;
 
 	}
 
@@ -395,11 +393,11 @@ class GFCustomEntryLimit extends GFAddOn {
 	}
 
 	/**
-	* Entries Left Shortcode
+	* Entries remaining Shortcode
 	* https://gravitywiz.com/shortcode-display-number-of-entries-left/
 	*/
 
-	function entries_left_shortcode( $output, $atts ) {
+	function entries_remaining_shortcode( $output, $atts ) {
 
 		extract( shortcode_atts( array(
 			'id' => false,
@@ -413,14 +411,14 @@ class GFCustomEntryLimit extends GFAddOn {
 		if( ! rgar( $form, 'limitEntries' ) || ! rgar( $form, 'limitEntriesCount' ) )
 			return '';
 
-		$entries_left = $output = $this->get_limit_margin($form);
+		$entries_remaining = $output = $this->get_limit_margin($form);
 
 		if( $format ) {
 			$format = $format == 'decimal' ? '.' : ',';
-			$output = number_format( $entries_left, 0, false, $format );
+			$output = number_format( $entries_remaining, 0, false, $format );
 		}
 
-		return $entries_left > 0 ? $output : 0;
+		return $entries_remaining > 0 ? $output : 0;
 
 	}
 
