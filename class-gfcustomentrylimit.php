@@ -115,9 +115,7 @@ class GFCustomEntryLimit extends GFAddOn {
 
 			<li class="include-as-addend field_setting">
 				<label for="visibility" class="section_label">
-					<?php esc_html_e( 'Field Usage', 'typewheel-gf-custom-entry-limit' ); ?></label>
-
-				<input type="checkbox" id="include-as-addend" value="1" onclick="SetFieldProperty( 'includeAsAddend', this.checked);">
+					<?php esc_html_e( 'Field Usage' ); ?></label>
 
 				<label class="inline" for="include-as-addend">
 					<?php
@@ -125,6 +123,8 @@ class GFCustomEntryLimit extends GFAddOn {
 					gform_tooltip( 'include-as-addend-toolip' );
 					?>
 				</label>
+
+								<input type="checkbox" id="include-as-addend" value="1" onclick="SetFieldProperty( 'includeAsAddend', this.checked);">
 
 			</li>
 
