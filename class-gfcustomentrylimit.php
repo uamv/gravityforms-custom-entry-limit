@@ -143,7 +143,7 @@ class GFCustomEntryLimit extends GFAddOn {
 					// populates the stored value from the field back into the setting when the field settings are loaded
 					$( '#include-as-addend' ).attr( 'checked', field['includeAsAddend'] == true );
 					// if our desired condition is met, we show the field setting; otherwise, hide it
-					if( GetInputType( field ) == 'number' || GetInputType( field ) == 'singleproduct' || GetInputType( field ) == 'slider' ) {
+					if( GetInputType( field ) == 'number' || GetInputType( field ) == 'singleproduct' || GetInputType( field ) == 'slider' || GetInputType( field ) == 'quantity') {
 						$( '.include-as-addend' ).show();
 					} else {
 						$( '.include-as-addend' ).hide();
@@ -356,6 +356,7 @@ class GFCustomEntryLimit extends GFAddOn {
 			switch ( $type ) {
 				case 'number':
 				case 'slider':
+				case 'quantity':
 					$sum = $sum + (int) $lead[ $addend ];
 					break;
 
