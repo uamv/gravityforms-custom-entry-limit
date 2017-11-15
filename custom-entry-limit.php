@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms Custom Entry Limit
 Plugin URI: https://typewheel.xyz/project/custom-entry-limit
 Description: Adds options for custom limiting of number of entries to a Gravity Form.
-Version: 1.0.beta7
+Version: 1.0.beta8
 Author: Typewheel
 Author URI: https://typewheel.xyz/
 Typewheel Update ID: 2
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta7' );
+define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta8' );
 
 add_action( 'gform_loaded', array( 'GF_Custom_Entry_Limit_Bootstrap', 'load' ), 5 );
 
@@ -39,6 +39,7 @@ class GF_Custom_Entry_Limit_Bootstrap {
         }
 
         require_once( 'class-gfcustomentrylimit.php' );
+		require_once( 'class-typewheel-updater.php' );
 
         GFAddOn::register( 'GFCustomEntryLimit' );
 
