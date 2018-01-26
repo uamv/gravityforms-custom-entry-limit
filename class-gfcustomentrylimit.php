@@ -6,8 +6,8 @@ class GFCustomEntryLimit extends GFAddOn {
 
 	protected $_version = GF_CUSTOM_ENTRY_LIMIT_VERSION;
 	protected $_min_gravityforms_version = '1.9';
-	protected $_slug = 'customentrylimit';
-	protected $_path = 'customentrylimit/customentrylimit.php';
+	protected $_slug = 'gfcustomentrylimit';
+	protected $_path = 'gravityforms-custom-entry-limit/custom-entry-limit.php';
 	protected $_full_path = __FILE__;
 	protected $_title = 'Typewheel: Gravity Forms Custom Entry Limit';
 	protected $_short_title = 'Custom Entry Limit';
@@ -52,6 +52,14 @@ class GFCustomEntryLimit extends GFAddOn {
         add_filter( 'gform_shortcode_entry_count', array( $this, 'entry_count_shortcode' ), 10, 2 );
 
         add_filter( 'gform_validation', array( $this, 'validate_entry_margin' ) );
+
+
+
+				// add notices on plugin activation
+				// register_activation_hook( GF_CUSTOM_ENTRY_LIMIT_DIR_PATH . 'custom-entry-limit.php', array( $this, 'add_typewheel_notices' ) );
+
+
+
 	}
 
 
@@ -102,8 +110,6 @@ class GFCustomEntryLimit extends GFAddOn {
 	 * @return string
 	 */
 
-
-
 	// # ADMIN FUNCTIONS -----------------------------------------------------------------------------------------------
 
 	/**
@@ -124,7 +130,7 @@ class GFCustomEntryLimit extends GFAddOn {
 					?>
 				</label>
 
-								<input type="checkbox" id="include-as-addend" value="1" onclick="SetFieldProperty( 'includeAsAddend', this.checked);">
+				<input type="checkbox" id="include-as-addend" value="1" onclick="SetFieldProperty( 'includeAsAddend', this.checked);">
 
 			</li>
 

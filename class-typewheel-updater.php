@@ -47,7 +47,7 @@ if ( ! class_exists( 'twxyzThemePluginUpdate') ) {
 		 * @access private
 		 * @var string
 		 */
-		private $api_url = 'https://typewheel.xyz/wp-json/';
+		private $api_url = 'https://my.typewheel.xyz/wp-json/';
 
 		/**
 		 * Theme and plugin header for update id.
