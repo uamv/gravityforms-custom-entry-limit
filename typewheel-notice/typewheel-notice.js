@@ -10,6 +10,7 @@
 				 typewheel_notice_duration: $(this).data('dismissal-duration'),
 				 typewheel_notice: $(this).data('notice'),
 				 typewheel_notice_plugin: $(this).data('plugin'),
+				 typewheel_user: $(this).data('user'),
 
 			 }, function (response) {
 

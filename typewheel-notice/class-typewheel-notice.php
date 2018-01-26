@@ -213,59 +213,19 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
 			foreach ( $dismiss as $dismissal ) {
 				if ( 'week' == $dismissal ) {
-					$html .= __( '<i class="dashicons dashicons-calendar" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="' . $dismissal . '" title="Remind me in one week"></i>', 'typewheel-locale' );
+					$html .= __( '<i class="dashicons dashicons-calendar" data-user="' . $this->user['ID'] . '" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="' . $dismissal . '" title="Remind me in one week"></i>', 'typewheel-locale' );
 				} elseif ( 'month' == $dismissal ) {
-					$html .= __( '<i class="dashicons dashicons-calendar-alt" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="' . $dismissal . '" title="Remind me in one month"></i>', 'typewheel-locale' );
+					$html .= __( '<i class="dashicons dashicons-calendar-alt" data-user="' . $this->user['ID'] . '" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="' . $dismissal . '" title="Remind me in one month"></i>', 'typewheel-locale' );
 				}
 			}
 
-			$html .= __( '<i class="dashicons dashicons-no" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="forever" title="Hide forever"></i>', 'typewheel-locale' );
+			$html .= __( '<i class="dashicons dashicons-no" data-user="' . $this->user['ID'] . '" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="forever" title="Hide forever"></i>', 'typewheel-locale' );
 
 			$html .= '</span>';
 
 			return $html;
 
 		}
-
-
-		/**
-		 * Process any responses to the displayed notices.
-		 *
-		 * @since    1.0
-		 */
-		public function process_notice() {
-
-			$duration = $_POST['duration'];
-			$notice = $_POST['notice'];
-
-			switch ( $duration ) {
-				case 'week':
-					$this->user['notices'][ $notice ]['time'] = time() + 604800;
-					break;
-				case 'month':
-					$this->user['notices'][ $notice ]['time'] = time() + 2592000;
-					break;
-				case 'forever':
-					$this->user['notices'][ $notice ]['trigger'] = FALSE;
-					break;
-				case 'undismiss':
-					foreach ( $this->user['notices'] as $name => $args ) {
-						$this->user['notices'][ $name ]['trigger'] = TRUE;
-						$this->user['notices'][ $name ]['time'] = time() - 5;
-					}
-					break;
-				default:
-					break;
-			}
-
-			// Update the option
-			update_user_meta( $this->user['ID'], $this->prefix . '_typewheel_notices', $this->user['notices'] );
-
-			$response = array( 'success' => true, 'notice' => $notice );
-
-			wp_send_json( $response );
-
-		} // end process_notice_response
 
 	}
 }
@@ -278,9 +238,10 @@ if ( ! function_exists( 'typewheel_notices_process' ) ) {
 		$duration = $_POST['typewheel_notice_duration'];
 		$notice = $_POST['typewheel_notice'];
 		$plugin = $_POST['typewheel_notice_plugin'];
+		$userid = $_POST['typewheel_user'];
 
 		// Get the notice options from the user
-		$user = get_user_meta( 2, $plugin . '_typewheel_notices', true );
+		$user = get_user_meta( $userid, $plugin . '_typewheel_notices', true );
 
 		switch ( $duration ) {
 			case 'week':
@@ -303,7 +264,7 @@ if ( ! function_exists( 'typewheel_notices_process' ) ) {
 		}
 
 		// Update the option
-		update_user_meta( 2, $plugin . '_typewheel_notices', $user );
+		update_user_meta( $userid, $plugin . '_typewheel_notices', $user );
 
 		$response = array( 'success' => true, 'notice' => $notice, 'plugin' => $plugin );
 
