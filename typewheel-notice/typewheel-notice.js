@@ -16,7 +16,7 @@
 
 				 if ( response.success ) {
 
-					 $('div#'+response.notice+'-typewheel-notice').hide();
+					 $('div#'+response.notice+'-typewheel-notice').slideUp();
 
 				 }
 			 }
