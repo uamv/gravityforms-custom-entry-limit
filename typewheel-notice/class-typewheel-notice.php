@@ -157,10 +157,12 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
 			if ( isset( $_GET['page'] ) ) {
 				$page = $pagenow . '?page=' . $_GET['page'];
+			} else {
+				$page = $pagenow;
 			}
 
 			$html = '<style>
-                            .typewheel-notice i.dashicons {
+                            .typewheel-notice i.dashicons.featured-icon {
                                 margin: 0 9px 0 -3px;
                             }
 							span[id$="-typewheel-notice-dismissals"] i.dashicons {
@@ -185,7 +187,7 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
 					$html .= '<div id="' . $notice . '-typewheel-notice" class="notice notice-' . $args['type'] . ' typewheel-notice' . '" style="' . esc_attr( $style ) . '">';
 						$html .= '<p>';
-							$html .= isset( $args['icon'] ) ? '<i class="dashicons dashicons-' . $args['icon'] . '"></i>' : '';
+							$html .= isset( $args['icon'] ) ? '<i class="dashicons dashicons-' . $args['icon'] . ' featured-icon"></i>' : '';
 							$html .= apply_filters( $notice . '_typewheel_notice_content', $args['content'], $notice );
 							$html .= $this->get_dismissals( $notice, $args['dismiss'] );
 						$html .= '</p>';
