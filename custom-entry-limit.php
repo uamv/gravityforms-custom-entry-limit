@@ -82,7 +82,7 @@ function gfcustomentrylimit_notices() {
 		$typewheel_notices = array(
 			$prefix . '-give' => array(
 				'trigger' => true,
-				'time' => time() + 30,
+				'time' => time() + 604800,
 				'dismiss' => array( 'month' ),
 				// 'type' => 'success',
 				'content' => 'Is <strong>GF Custom Entry Limit</strong> working well for you? Please consider a <a href="https://typewheel.xyz/give/?ref=GF%20Custom%20Entry%20Limit" target="_blank">small donation</a> to encourage further development.',
