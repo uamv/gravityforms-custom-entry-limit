@@ -1,20 +1,22 @@
 <?php
 
 /**
-* Registers the plugin's administrative stylesheets and JavaScript
+* Registers administrative stylesheets and JavaScript
 *
 * @since    1.0
 */
 if ( ! function_exists( 'typewheel_notices_add_stylesheets_and_javascript' ) ) {
+
+	add_action( 'admin_enqueue_scripts', 'typewheel_notices_add_stylesheets_and_javascript' );
 	function typewheel_notices_add_stylesheets_and_javascript() {
 
-	   wp_enqueue_script( 'typewheel-notice', plugins_url( 'typewheel-notice/typewheel-notice.js', dirname(__FILE__) ), array( 'jquery' ) );
-	   wp_localize_script( 'typewheel-notice', 'TypewheelNotice', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+		wp_enqueue_style( 'typewheel-notice', plugins_url( 'typewheel-notice/typewheel-notice.css', dirname(__FILE__) ) );
+		wp_enqueue_script( 'typewheel-notice', plugins_url( 'typewheel-notice/typewheel-notice.js', dirname(__FILE__) ), array( 'jquery' ) );
+		wp_localize_script( 'typewheel-notice', 'TypewheelNotice', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 
 	} // end add_stylesheets_and_javascript
+
 }
-// Load the administrative Stylesheets and JavaScript
-add_action( 'admin_enqueue_scripts', 'typewheel_notices_add_stylesheets_and_javascript' );
 
 if ( ! class_exists( 'Typewheel_Notice' ) ) {
 	/**
@@ -50,15 +52,6 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 		public $user;
 
 		/**
-		 * Version
-		 *
-		 * @since    1.0
-		 *
-		 * @var      array
-		 */
-		public $version;
-
-		/**
 		 * Notices.
 		 *
 		 * @since    1.0
@@ -68,7 +61,7 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 		public $prefix;
 
 		/*---------------------------------------------------------------------------------*
-		 * Consturctor
+		 * Constructor
 		 *---------------------------------------------------------------------------------*/
 
 		/**
@@ -76,21 +69,22 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 		 *
 		 * @since     1.0
 		 */
-		public function __construct( $prefix, $notices = array() ) {
+		public function __construct( $prefix, $notices = array(), $activation = array() ) {
 
 			$this->prefix = $prefix;
+			if ( ! empty( $activation ) ) { $this->activation = $activation; }
 			$this->user = array();
 
-			// If passing new notices, then add them to the DB
-			if ( ! empty( $notices ) ) {
+			// Display activation notice when plugin is activated or display notices to specific user from DB
+			if ( ! get_option( $this->prefix . '_activated' ) ) {
+
+				update_option( $prefix . '_activated', true );
+				$this->display_activation();
 
 				$this->notices = $notices;
-
 				update_option( $this->prefix . '_typewheel_notices', $this->notices );
 
-			}
-			// Otherwise, pull notices from the DB
-			else {
+			} else {
 
 				$this->notices = get_option( $this->prefix . '_typewheel_notices', array() );
 
@@ -107,13 +101,12 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 		 *---------------------------------------------------------------------------------*/
 
 		 /**
- 		 * Returns the active plugin notices for display on the settings page summary.
+ 		 * Check user and set/get notices
  		 *
  		 * @since    1.0
  		 */
  		public function process_user() {
 
- 			global $pagenow;
  			$current_user = wp_get_current_user();
 
 			$this->user['ID'] = $current_user->ID;
@@ -141,13 +134,13 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
  			}
 
- 			// Update the users meta
+ 			// Update the user meta
  			update_user_meta( $this->user['ID'], $this->prefix . '_typewheel_notices', $this->user['notices'] );
 
 		}
 
 		/**
-		 * Returns the active plugin notices for display on the settings page summary.
+		 * Displays active plugin notices.
 		 *
 		 * @since    1.0
 		 */
@@ -155,44 +148,28 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
 			global $pagenow;
 
-			if ( isset( $_GET['page'] ) ) {
-				$page = $pagenow . '?page=' . $_GET['page'];
-			} else {
-				$page = $pagenow;
-			}
+			// If page parameter exists, append to $pagenow for finer control of where to show notices
+			$page = isset( $_GET['page'] ) ? $pagenow . '?page=' . $_GET['page'] : $pagenow;
 
-			$html = '<style>
-                            .typewheel-notice i.dashicons.featured-icon {
-                                margin: 0 9px 0 -3px;
-                            }
-							span[id$="-typewheel-notice-dismissals"] i.dashicons {
-								margin: 0 0 0 9px;
-							}
-							span[id$="-typewheel-notice-dismissals"] i.dashicons:hover {
-								cursor: pointer;
-							}
-					</style>';
+			$html = '';
 
 			// Loop though the notices
 			foreach ( $this->notices as $notice => $args ) {
 
+				// Set capability for viewing notice, defaulting to `read`
 				$cap = ( isset( $args['capability'] ) && '' != $args['capability'] ) ? $args['capability'] : 'read';
+				$type = ( isset( $args['type'] ) && '' != $args['type'] ) ? $args['type'] : 'info';
 
-				// Check that the notice is supposed to be displayed on this page and that it is active for the user
+				// Check that the notice is supposed to be displayed on this page and is active for the user
 				if ( in_array( $page, $args['location'] ) && $this->user['notices'][ $notice ]['trigger'] && $this->user['notices'][ $notice ]['time'] < time() && current_user_can( $cap ) ) {
-					if ( is_array( $args['style'] ) ) {
-						$style = '';
-						foreach ( $args['style'] as $att => $value ) {
-							$style .= $att . ':' . $value . ';';
-						}
-					}
 
-					$html .= '<div id="' . $notice . '-typewheel-notice" class="notice notice-' . $args['type'] . ' typewheel-notice' . '" style="' . esc_attr( $style ) . '">';
+					// Assemble the notice
+					$html .= '<div id="' . $notice . '-typewheel-notice" class="notice notice-' . $args['type'] . ' typewheel-notice' . '" style="' . esc_attr( $this->styles( $args['style'] ) ) . '">';
 						$html .= '<p>';
 							$html .= isset( $args['icon'] ) ? '<i class="dashicons dashicons-' . $args['icon'] . ' featured-icon"></i>' : '';
 							$html .= apply_filters( $notice . '_typewheel_notice_content', $args['content'], $notice );
 							$html .= $this->get_dismissals( $notice, $args['dismiss'] );
-							$html .= isset( $args['icon'] ) ? '<i class="dashicons dashicons-' . $args['icon'] . ' featured-icon"></i>' : '';
+							$html .= isset( $args['icon'] ) && '' != $args['icon'] ? '<i class="dashicons dashicons-' . $args['icon'] . ' featured-icon"></i>' : '';
 							$html .= apply_filters( $notice . '_typewheel_notice_content', $args['content'], $notice );
 						$html .= '</p>';
 					$html .= '</div>';
@@ -205,15 +182,68 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 
 		} // end display_notices
 
+		/**
+		 * Displays activation notice.
+		 *
+		 * @since    1.0
+		 */
+		public function display_activation() {
+
+			global $pagenow;
+
+			// Set capability for viewing notice, defaulting to `read`
+			$cap = ( isset( $this->activation['capability'] ) && '' != $this->activation['capability'] ) ? $this->activation['capability'] : 'read';
+
+			// Check that the notice is supposed to be displayed on this page and is active for the user
+			if ( $pagenow == 'plugins.php' && current_user_can( $cap ) ) {
+
+				// Assemble notice
+				$html = '<div id="activation-typewheel-notice" class="notice notice-info typewheel-notice' . '" style="' . esc_attr( $this->styles( $this->activation['style'] ) ) . '">';
+					$html .= '<p>';
+						$html .= isset( $this->activation['icon'] ) && '' != $this->activation['icon'] ? '<i class="dashicons dashicons-' . $this->activation['icon'] . ' featured-icon"></i>' : '';
+						$html .= apply_filters( 'activation_typewheel_notice_content', $this->activation['content'] );
+					$html .= '</p>';
+				$html .= '</div>';
+
+				echo $html;
+
+			}
+
+		} // end display_activation
 
 		/**
-		 * Get any assigned dismissal notices
+		 * Assemble the styles from array or string
+		 *
+		 * @since    1.0
+		 */
+		private function styles( $styles ) {
+
+			if ( is_array( $styles ) ) {
+
+				$style = '';
+
+				foreach ( $styles as $att => $value ) {
+
+					$style .= $att . ':' . $value . ';';
+
+				}
+
+				return $style;
+
+			} else {
+
+				return $styles;
+
+			}
+
+		}
+
+		/**
+		 * Assemble and return any assigned dismissal notices
 		 *
 		 * @since    1.0
 		 */
 		public function get_dismissals( $notice, $dismiss ) {
-
-			global $pagenow;
 
 			$html = '<span id="' . $notice . '-typewheel-notice-dismissals" style="float:right;">';
 
@@ -225,7 +255,7 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 				}
 			}
 
-			$html .= __( '<i class="dashicons dashicons-no" data-user="' . $this->user['ID'] . '" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="forever" title="Hide forever"></i>', 'typewheel-locale' );
+			$html .= __( '<i class="dashicons dashicons-dismiss" data-user="' . $this->user['ID'] . '" data-plugin="' . $this->prefix . '" data-notice="' . $notice . '" data-dismissal-duration="forever" title="Hide forever" style="font-size: 15px; position: relative; top: 3px;"></i>', 'typewheel-locale' );
 
 			$html .= '</span>';
 
@@ -236,8 +266,9 @@ if ( ! class_exists( 'Typewheel_Notice' ) ) {
 	}
 }
 
-// Process the form
+// AJAX processing of dismissals
 if ( ! function_exists( 'typewheel_notices_process' ) ) {
+
 	add_action( 'wp_ajax_dismiss_notice', 'typewheel_notices_process' );
 	function typewheel_notices_process() {
 
@@ -269,7 +300,7 @@ if ( ! function_exists( 'typewheel_notices_process' ) ) {
 				break;
 		}
 
-		// Update the option
+		// Update the user meta
 		update_user_meta( $userid, $plugin . '_typewheel_notices', $user );
 
 		$response = array( 'success' => true, 'notice' => $notice, 'plugin' => $plugin );
