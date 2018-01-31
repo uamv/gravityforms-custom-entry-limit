@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms Custom Entry Limit
 Plugin URI: https://typewheel.xyz/project/custom-entry-limit
 Description: Adds options for custom limiting of number of entries to a Gravity Form.
-Version: 1.0.beta9
+Version: 1.0.beta10
 Author: Typewheel
 Author URI: https://typewheel.xyz/
 Typewheel Update ID: 2
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta9' );
+define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta10' );
 define( 'GF_CUSTOM_ENTRY_LIMIT_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GF_CUSTOM_ENTRY_LIMIT_DIR_URL', plugin_dir_url( __FILE__ ) );
 
@@ -57,26 +57,17 @@ function gf_custom_entry_limit() {
 
 /**** DECLARE TYPEWHEEL NOTICES ****/
 
-add_action( 'admin_notices', 'gfcustomentrylimit_notices' );
-/**
- * Displays a plugin notices
- *
- * @since    1.0
- */
-function gfcustomentrylimit_notices() {
+if ( ! function_exists( 'gfcustomentrylimit_notices' ) && apply_filters( 'show_typewheel_notices', true ) ) {
 
-	$prefix = str_replace( '-', '_', dirname( plugin_basename(__FILE__) ) );
+	add_action( 'admin_notices', 'gfcustomentrylimit_notices' );
+	/**
+	 * Displays a plugin notices
+	 *
+	 * @since    1.0
+	 */
+	function gfcustomentrylimit_notices() {
 
-	if ( ! get_option( $prefix . '_activated' ) ) {
-
-		// // Notice to show on plugin activation
-		// $html = '<div class="updated">';
-		// 	$html .= '<p style="display: inline-block">';
-		// 		$html .= __( "<strong>Nice!</strong> We're up and running! Enjoy your experience with Gravity Forms: Custom Entry Limit.", 'typewheel' );
-		// 	$html .= '</p>';
-		// $html .= '</div><!-- /.updated -->';
-        //
-		// echo $html;
+		$prefix = str_replace( '-', '_', dirname( plugin_basename(__FILE__) ) );
 
 		// Define the notices
 		$typewheel_notices = array(
@@ -87,23 +78,17 @@ function gfcustomentrylimit_notices() {
 				// 'type' => 'success',
 				'content' => 'Is <strong>GF Custom Entry Limit</strong> working well for you? Please consider a <a href="https://typewheel.xyz/give/?ref=GF%20Custom%20Entry%20Limit" target="_blank">small donation</a> to encourage further development.',
 				'icon' => 'heart',
-				'style' => array( 'background-image' => 'linear-gradient( to bottom right, rgb(215, 215, 215), rgb(231, 211, 186) )', 'border-left' => '0' ),
+				'style' => array( 'background-image' => 'linear-gradient( to bottom right, rgb(215, 215, 215), rgb(231, 211, 186) )', 'border-left-color' => '#3F3F3F' ),
 				'location' => array( 'admin.php?page=gf_edit_forms', 'admin.php?page=gf_entries', 'admin.php?page=gf_settings', 'admin.php?page=gf_addons' ),
 			),
 		);
 
 		// get the notice class
-		$notices = new Typewheel_Notice( $prefix, $typewheel_notices );
+		new Typewheel_Notice( $prefix, $typewheel_notices );
 
-		update_option( $prefix . '_activated', true );
+	} // end display_plugin_notices
 
-	} else {
-
-		$notices = new Typewheel_Notice( $prefix );
-
-	}
-
-} // end display_plugin_notices
+}
 
 /**
  * Deletes activation marker so it can be displayed when the plugin is reinstalled or reactivated

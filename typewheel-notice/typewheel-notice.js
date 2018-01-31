@@ -1,5 +1,5 @@
 /**
- * Handles Glance That icon and form interaction
+ * Handles Typewheel Notice Dismissals
  */
  jQuery(document).ready(function($) {
 
