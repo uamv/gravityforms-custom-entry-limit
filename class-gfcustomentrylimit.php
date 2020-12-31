@@ -9,7 +9,7 @@ class GFCustomEntryLimit extends GFAddOn {
 	protected $_slug = 'gfcustomentrylimit';
 	protected $_path = 'gravityforms-custom-entry-limit/custom-entry-limit.php';
 	protected $_full_path = __FILE__;
-	protected $_title = 'Typewheel: Gravity Forms Custom Entry Limit';
+	protected $_title = 'Gravity Forms Custom Entry Limit';
 	protected $_short_title = 'Custom Entry Limit';
 
 	private static $_instance = null;

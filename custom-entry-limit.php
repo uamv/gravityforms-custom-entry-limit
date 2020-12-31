@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms Custom Entry Limit
 Plugin URI: https://typewheel.xyz/project/custom-entry-limit
 Description: Adds options for custom limiting of number of entries to a Gravity Form.
-Version: 1.0.beta10
+Version: 1.0.beta11
 Author: Typewheel
 Author URI: https://typewheel.xyz/
 Typewheel Update ID: 2
@@ -26,12 +26,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta10' );
+define( 'GF_CUSTOM_ENTRY_LIMIT_VERSION', '1.0.beta11' );
 define( 'GF_CUSTOM_ENTRY_LIMIT_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GF_CUSTOM_ENTRY_LIMIT_DIR_URL', plugin_dir_url( __FILE__ ) );
-
-require_once( 'class-typewheel-updater.php' );
-require_once( 'typewheel-notice/class-typewheel-notice.php' );
 
 add_action( 'gform_loaded', array( 'GF_Custom_Entry_Limit_Bootstrap', 'load' ), 5 );
 
@@ -54,52 +51,3 @@ class GF_Custom_Entry_Limit_Bootstrap {
 function gf_custom_entry_limit() {
     return GFCustomEntryLimit::get_instance();
 }
-
-/**** DECLARE TYPEWHEEL NOTICES ****/
-
-if ( ! function_exists( 'gfcustomentrylimit_notices' ) && apply_filters( 'show_typewheel_notices', true ) ) {
-
-	add_action( 'admin_notices', 'gfcustomentrylimit_notices' );
-	/**
-	 * Displays a plugin notices
-	 *
-	 * @since    1.0
-	 */
-	function gfcustomentrylimit_notices() {
-
-		$prefix = str_replace( '-', '_', dirname( plugin_basename(__FILE__) ) );
-
-		// Define the notices
-		$typewheel_notices = array(
-			$prefix . '-give' => array(
-				'trigger' => true,
-				'time' => time() + 604800,
-				'dismiss' => array( 'month' ),
-				// 'type' => 'success',
-				'content' => 'Is <strong>GF Custom Entry Limit</strong> working well for you? Please consider a <a href="https://typewheel.xyz/give/?ref=GF%20Custom%20Entry%20Limit" target="_blank">small donation</a> to encourage further development.',
-				'icon' => 'heart',
-				'style' => array( 'background-image' => 'linear-gradient( to bottom right, rgb(215, 215, 215), rgb(231, 211, 186) )', 'border-left-color' => '#3F3F3F' ),
-				'location' => array( 'admin.php?page=gf_edit_forms', 'admin.php?page=gf_entries', 'admin.php?page=gf_settings', 'admin.php?page=gf_addons' ),
-			),
-		);
-
-		// get the notice class
-		new Typewheel_Notice( $prefix, $typewheel_notices );
-
-	} // end display_plugin_notices
-
-}
-
-/**
- * Deletes activation marker so it can be displayed when the plugin is reinstalled or reactivated
- *
- * @since    1.0
- */
-function gfcustomentrylimit_remove_activation_marker() {
-
-	$prefix = str_replace( '-', '_', dirname( plugin_basename(__FILE__) ) );
-
-	delete_option( $prefix . '_activated' );
-
-}
-register_deactivation_hook( dirname(__FILE__) . '/custom-entry-limit.php', 'gfcustomentrylimit_remove_activation_marker' );
