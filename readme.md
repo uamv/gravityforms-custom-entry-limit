@@ -5,6 +5,8 @@ Gravity Forms: Custom Entry Limit extends the Gravity Forms WordPress plugin by 
 
 This repository is a development version intended to facilitate communication with developers. I will aim to keep it stable, but use at your own discretion. Pull requests are welcome.
 
+THIS PLUGIN IS NOT CURRENTLY COMPATIBLE WITH GRAVITY FORMS 2.5 OR GREATER
+
 ## Recommendation
 This plugin was initially inspired by code snippets provided by [Gravity Wiz](https://twhl.xyz/gw/). Since initial development of this plugin, Gravity Wiz has release their own perk, [GP Limit Submissions](https://twhl.xyz/gw-ls/), which provides this same functionality along with additional options for limiting submissions. We highly recommend you use their solution, which will include reliable support and ongoing development.
 
